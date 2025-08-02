@@ -14,5 +14,11 @@ A simple command-line Pastebin client with both interactive and command-style mo
 Clone this repo:
 
 ```bash
-git clone https://github.com/yourusername/pastebincli.git
+git clone https://github.com/CoolSoulz/pastebincli.git
 cd pastebincli
+```
+## Running
+Run it with python's interpreter:
+```bash
+python pastebincli.py
+```
