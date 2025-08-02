@@ -1,0 +1,20 @@
+Metadata-Version: 2.4
+Name: pastebincli
+Version: 1.0.0
+Summary: A command-line interface to paste to Pastebin
+Home-page: https://github.com/CoolSoulz/pastebincli
+Author: CoolSoulz
+License: MIT
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.10
+Requires-Dist: requests
+Requires-Dist: rich
+Dynamic: author
+Dynamic: classifier
+Dynamic: home-page
+Dynamic: license
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary

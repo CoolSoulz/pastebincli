@@ -1,0 +1,9 @@
+README.md
+setup.py
+pastebincli/__main__.py
+pastebincli.egg-info/PKG-INFO
+pastebincli.egg-info/SOURCES.txt
+pastebincli.egg-info/dependency_links.txt
+pastebincli.egg-info/entry_points.txt
+pastebincli.egg-info/requires.txt
+pastebincli.egg-info/top_level.txt

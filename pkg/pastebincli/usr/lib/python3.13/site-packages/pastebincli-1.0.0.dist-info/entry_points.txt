@@ -1,0 +1,2 @@
+[console_scripts]
+pastebincli = pastebincli.__main__:main
