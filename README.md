@@ -11,14 +11,4 @@ A simple command-line Pastebin client with both interactive and command-style mo
 
 ## Installation
 
-Clone this repo:
-
-```bash
-git clone https://github.com/CoolSoulz/pastebincli.git
-cd pastebincli
-```
-## Running
-Run it with python's interpreter:
-```bash
-python pastebincli.py
-```
+Currently available on the [AUR](https://aur.archlinux.org/packages/pastebincli). I might add it to more repos later, idrk
