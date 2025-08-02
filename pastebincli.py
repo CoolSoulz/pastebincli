@@ -6,45 +6,52 @@ import requests
 import tomllib
 import io  # needed for capturing help output
 
+from rich import print
+from rich.console import Console
+from rich.panel import Panel
+from rich.prompt import Prompt
+
+console = Console()
+
 CONFIG_DIR = os.path.expanduser("~/.config/pastebincli")
 CONFIG_FILE = os.path.join(CONFIG_DIR, "config.toml")
 
 def first_time_setup():
-    print("==First time setup for pastebincli==")
+    console.print("[bold magenta]== First time setup for pastebincli ==[/bold magenta]")
     time.sleep(1)
-    apikey = input(
-        "You need a Pastebin API key to use this application.\n"
-        "Go to https://pastebin.com/doc_api, login, and grab it. Paste it here: "
+    apikey = Prompt.ask(
+        "\n[cyan]You need a Pastebin API key to use this application.[/cyan]\n"
+        "Go to [blue]https://pastebin.com/doc_api[/blue], login, and paste your API key here"
     )
     os.makedirs(CONFIG_DIR, exist_ok=True)
     with open(CONFIG_FILE, 'w') as f:
         f.write(f'api_key = "{apikey}"\n')
-    print("config saved at", CONFIG_FILE)
+    console.print(f"[green]✓ Config saved at[/green] [italic]{CONFIG_FILE}[/italic]")
 
 def load_config():
     if not os.path.exists(CONFIG_FILE):
-        print("config not found. run `pastebincli config` first.")
+        console.print("[red]Config not found.[/red] Run [bold]pastebincli config[/bold] first.")
         sys.exit(1)
     with open(CONFIG_FILE, 'rb') as f:
         return tomllib.load(f)
 
 def create_paste_interactive(config):
-    print("create a paste (interactive mode)")
-    title = input("title: ")
-    text = input("text: ")
-    private = input("private? (yes/no): ")
-    expire = input("expire time (e.g. 10M, 1H, 1D): ")
-    format = input("format (python, bash, etc): ")
+    console.print("[bold magenta]Create a paste (interactive mode)[/bold magenta]\n")
+    title = Prompt.ask("title")
+    text = Prompt.ask("text")
+    private = Prompt.ask("private? (yes/no)", default="no")
+    expire = Prompt.ask("expire time (e.g. 10M, 1H, 1D)", default="10M")
+    format = Prompt.ask("format (python, bash, etc)", default="text")
 
-    print("\nconfirm:")
-    print("title:", title)
-    print("text:", text)
-    print("private:", private)
-    print("expire:", expire)
-    print("format:", format)
-    confirm = input("continue? (y/n): ")
+    console.print("\n[bold]Confirm:[/bold]")
+    console.print(f"[bold]Title:[/bold] {title}")
+    console.print(f"[bold]Text:[/bold] {text}")
+    console.print(f"[bold]Private:[/bold] {private}")
+    console.print(f"[bold]Expire:[/bold] {expire}")
+    console.print(f"[bold]Format:[/bold] {format}")
+    confirm = Prompt.ask("continue? (y/n)", default="y")
     if confirm.lower() not in ("y", "yes"):
-        print("cancelled.")
+        console.print("[yellow]Cancelled.[/yellow]")
         return
 
     send_paste(title, text, private, expire, format, config)
@@ -52,14 +59,14 @@ def create_paste_interactive(config):
 def create_paste_from_args(args, config):
     if args.file:
         if not os.path.exists(args.file):
-            print("file not found.")
+            console.print(f"[red]Error:[/red] file '{args.file}' not found.")
             return
         with open(args.file, 'r') as f:
             text = f.read()
     elif args.text:
         text = args.text
     else:
-        print("need --text or --file.")
+        console.print("[red]Error:[/red] Need --text or --file.")
         return
 
     title = args.title or "untitled"
@@ -81,39 +88,39 @@ def send_paste(title, text, private, expire, format, config):
         "api_paste_format": format,
     }
 
-    print("sending paste...")
+    console.print("[cyan]Sending paste...[/cyan]")
     response = requests.post(api_url, data=data)
 
     if response.status_code == 200:
-        print("done.")
-        print("url:", response.text)
+        console.print(Panel.fit(response.text, title="[green]Paste Created[/green]"))
     else:
-        print("failed.")
-        print("status code:", response.status_code)
-        print("response:", response.text)
+        console.print(Panel.fit(
+            f"[bold red]Failed to create paste[/bold red]\n"
+            f"Status: {response.status_code}\nResponse: {response.text}",
+            title="[red]Error[/red]"
+        ))
 
 def show_help(create_parser, main_parser):
-    print("""
-pastebincli - command line pastebin client
+    console.print("""
+[bold magenta]pastebincli[/bold magenta] - command line pastebin client
 
-usage:
+[bold]Usage:[/bold]
   pastebincli <command> [options]
 
-commands:
-  create     make a paste
-  config     first time setup
-  help       show this help
+[bold]Commands:[/bold]
+  [green]create[/green]     make a paste
+  [green]config[/green]     first time setup
+  [green]help[/green]       show this help
 
-create options:
+[bold]Create options:[/bold]
 """)
     help_buffer = io.StringIO()
     create_parser.print_help(file=help_buffer)
-    create_help_text = help_buffer.getvalue()
+    console.print(help_buffer.getvalue())
     help_buffer.close()
-    print(create_help_text)
 
-    print("""
-examples:
+    console.print("""
+[bold]Examples:[/bold]
   pastebincli create --file hello.py --title test
   pastebincli config
 """)
@@ -146,7 +153,7 @@ def main():
     elif args.command == "help" or args.command is None:
         show_help(create_parser, parser)
     else:
-        print("unknown command:", args.command)
+        console.print(f"[red]Unknown command:[/red] {args.command}")
         show_help(create_parser, parser)
 
 if __name__ == "__main__":
