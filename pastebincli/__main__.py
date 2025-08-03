@@ -157,6 +157,11 @@ def show_help(create_parser, main_parser):
   pastebincli delete a1b2c3d4
   pastebincli config
 """)
+    console.print("""
+        Thanks for using pastebincli!
+        If you'd like to support me and help me keep making cool tools,
+        please visit: https://ko-fi.com/coolsoulz
+        """)
 
 def main():
     parser = argparse.ArgumentParser(prog="pastebincli", add_help=False)
